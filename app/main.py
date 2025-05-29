@@ -30,37 +30,39 @@ def detectar_marcadores_brancos(img):
         if radius > 4:
             pontos.append((int(x), int(y)))
 
+    # Ordenação personalizada pode ser necessária aqui para manter consistência com nomes
     pontos = sorted(pontos, key=lambda p: (p[1], p[0]))
 
     return pontos
 
 def desenhar_linhas_com_conexoes(img, pontos):
     conexoes = [
-        (0, 1), 
-        (0, 2), 
-        (1, 3), 
-        # (2, 4),
-        # (0, 5), 
-        (3, 7), 
-        (4, 8),
-        (5, 9), 
-         
-        (5, 4),
-        (5, 1), 
-        (2, 6), 
-        (8, 10), 
-        (10, 13),
-        (11, 12),
-        (9, 11), 
-        (0, 4),
-        
-        (13, 14), 
-        (14, 15)
+        (0, 1), (0, 2), (1, 3), (3, 7), 
+        (4, 8), (5, 9), (5, 4), (5, 1), 
+        (2, 6), (8, 10), (10, 13), (11, 12),
+        (9, 11), (0, 4), (13, 14), (14, 15)
     ]
 
-    for ponto in pontos:
-        cv2.circle(img, ponto, 8, (0, 255, 0), -1)
+    nomes = [
+        "ACD", "ACE",      # 0, 1
+        "ELD", "ELE",      # 2, 3
+        "EAD", "EAE",      # 4, 5
+        "CUD", "CUE",      # 6, 7
+        "TDF", "TDE",      # 8, 9
+        "LJD", "LJE",      # 10, 11
+        "MLE", "MLD"       # 12, 13
+    ]
 
+
+    # Desenha pontos e nomes
+    for idx, ponto in enumerate(pontos):
+        x, y = ponto
+        cv2.circle(img, (x, y), 8, (0, 255, 0), -1)
+        if idx < len(nomes):
+            cv2.putText(img, nomes[idx], (x + 5, y - 5),
+                        cv2.FONT_HERSHEY_SIMPLEX, 1.2, (255, 255, 0), 1, cv2.LINE_AA)
+
+    # Desenha conexões
     for i, j in conexoes:
         if i < len(pontos) and j < len(pontos):
             cv2.line(img, pontos[i], pontos[j], (0, 255, 255), 4)
