@@ -4,6 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 import cv2
 import numpy as np
 import base64
+from app.pacientes import router as pacientes_router
 
 app = FastAPI()
 
@@ -14,6 +15,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+# Importando o router de para cadastro de pacientes
+app.include_router(pacientes_router)
 
 conexoes = [
     (0, 1), (0, 2), (1, 3), (3, 7), 
