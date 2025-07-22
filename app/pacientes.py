@@ -79,3 +79,13 @@ async def cadastrar_paciente(request: Request):
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=str(e)
         )
+        
+@router.get("/listar-pacientes")
+def listar_pacientes():
+    conn = sqlite3.connect('app/pacientes.db')
+    cursor = conn.cursor()
+    cursor.execute("SELECT id, nome, idade, sexo FROM pacientes")
+    pacientes = cursor.fetchall()
+    conn.close()
+
+    return [{"id": p[0], "nome": p[1], "idade": p[2], "sexo": p[3]} for p in pacientes]
