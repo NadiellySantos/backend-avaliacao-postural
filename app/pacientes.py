@@ -4,7 +4,7 @@ import sqlite3
 
 router = APIRouter()
 
-# Cria a tabela PESSOA caso não exista
+# Cria a tabela PESSOA caso não exista, agora com idade e sexo
 def criar_tabela():
     conn = sqlite3.connect('app/pacientes.db')
     cursor = conn.cursor()
@@ -18,7 +18,9 @@ def criar_tabela():
             raca TEXT,
             profissao TEXT,
             telefone TEXT,
-            tipo_corporal TEXT
+            tipo_corporal TEXT,
+            idade INTEGER,
+            sexo TEXT
         )
     ''')
     conn.commit()
@@ -44,8 +46,9 @@ async def cadastrar_paciente(request: Request):
     profissao = data.get("profissao")
     telefone = data.get("telefone")
     tipo_corporal = data.get("tipo_corporal")
+    idade = data.get("idade")  # novo campo
+    sexo = data.get("sexo")    # novo campo
 
-    # Campos obrigatórios
     if not cpf or not nome or not data_nascimento:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -58,10 +61,12 @@ async def cadastrar_paciente(request: Request):
 
         cursor.execute("""
             INSERT INTO pessoa (
-                cpf, nome, data_nascimento, peso, raca, profissao, telefone, tipo_corporal
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                cpf, nome, data_nascimento, peso, raca, profissao,
+                telefone, tipo_corporal, idade, sexo
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """, (
-            cpf, nome, data_nascimento, peso, raca, profissao, telefone, tipo_corporal
+            cpf, nome, data_nascimento, peso, raca, profissao,
+            telefone, tipo_corporal, idade, sexo
         ))
 
         conn.commit()
@@ -84,7 +89,7 @@ async def cadastrar_paciente(request: Request):
 def listar_pacientes():
     conn = sqlite3.connect('app/pacientes.db')
     cursor = conn.cursor()
-    cursor.execute("SELECT id, nome, idade, sexo FROM pacientes")
+    cursor.execute("SELECT id, nome, idade, sexo FROM pessoa")
     pacientes = cursor.fetchall()
     conn.close()
 
