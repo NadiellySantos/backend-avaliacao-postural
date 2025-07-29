@@ -5,6 +5,8 @@ import cv2
 import numpy as np
 import base64
 from app.pacientes import router as pacientes_router
+from app.medicos import router as medicos_router
+
 
 app = FastAPI()
 
@@ -17,6 +19,8 @@ app.add_middleware(
 )
 # Importando o router de para cadastro de pacientes
 app.include_router(pacientes_router)
+app.include_router(medicos_router)
+
 
 conexoes = [
     (0, 1), (0, 2), (1, 3), (3, 7), 
