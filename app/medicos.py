@@ -93,7 +93,7 @@ async def cadastrar_medico(request: Request):
             detail="A senha deve conter no mínimo 8 caracteres, incluindo letra maiúscula, minúscula, número e caractere especial."
         )
 
-    senha = bcrypt.hashpw(senha_hash.encode('utf-8'), bcrypt.gensalt())
+    senha = bcrypt.hashpw(senha_hash.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
 
     try:
         conn = sqlite3.connect('app/pacientes.db')
@@ -106,7 +106,7 @@ async def cadastrar_medico(request: Request):
             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
         """, (
             cpf, nome, data_nascimento, especialidade,
-            telefone, crm, sexo, email, senha_hash
+            telefone, crm, sexo, email, senha
         ))
 
         conn.commit()
