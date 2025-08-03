@@ -1,11 +1,13 @@
 from fastapi import APIRouter, HTTPException, status, Request
 from fastapi.responses import JSONResponse
 import sqlite3
+from pydantic import BaseModel
+import bcrypt
 
 router = APIRouter()
 
 class LoginInput(BaseModel):
-    cpf: str
+    email: str
     senha: str
 
 @router.post("/login")
@@ -18,34 +20,45 @@ async def login(request: Request):
             detail="JSON inválido"
         )
 
-    cpf = data.get("cpf")
+    email = data.get("email")
     senha = data.get("senha")
 
-    print(f"Tentando login com CPF: {cpf} e senha: {senha} ")
+    print(f"Tentando login com E-mail: {email} e senha: {senha} ")
 
-    if not cpf or not senha:
+    if not email or not senha:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="CPF e senha são obrigatórios"
+            detail="E-mail e senha são obrigatórios"
         )
 
     try:
         conn = sqlite3.connect("app/pacientes.db")
         cursor = conn.cursor()
-        cursor.execute("SELECT nome FROM medico WHERE cpf = ? AND senha = ?", (cpf, senha))
+        # Buscar só pelo email (sem senha)
+        cursor.execute("SELECT nome, senha FROM medico WHERE email = ?", (email,))
         usuario = cursor.fetchone()
         conn.close()
 
-        if usuario:
+        if not usuario:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="E-mail ou senha inválidos"
+            )
+        
+        nome, senha_hash = usuario
+        senha_hash_bytes = senha_hash.encode('utf-8')
+
+        # Verifica senha
+        if bcrypt.checkpw(senha.encode('utf-8'), senha_hash_bytes):
             return JSONResponse(content={
                 "mensagem": "Login realizado com sucesso",
-                "nome": usuario[0],
-                "token": "fake-token-123" 
+                "nome": nome,
+                "token": "fake-token-123"
             })
         else:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="CPF ou senha inválidos"
+                detail="E-mail ou senha inválidos"
             )
 
     except Exception as e:

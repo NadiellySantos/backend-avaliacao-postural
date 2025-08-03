@@ -7,6 +7,7 @@ import base64
 from app.pacientes import router as pacientes_router
 from app.medicos import router as medicos_router
 from app.login import router as login_router
+from app.avaliacao import router as avaliacao_router
 
 
 
@@ -23,6 +24,7 @@ app.add_middleware(
 app.include_router(pacientes_router)
 app.include_router(medicos_router)
 app.include_router(login_router)
+app.include_router(avaliacao_router)
 
 
 
