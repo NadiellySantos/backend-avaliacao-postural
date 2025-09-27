@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException, status, Request
 from fastapi.responses import JSONResponse
-import sqlite3
+import mysql.connector
 from pydantic import BaseModel
 import bcrypt
 
@@ -32,10 +32,15 @@ async def login(request: Request):
         )
 
     try:
-        conn = sqlite3.connect("app/pacientes.db")
+        conn = mysql.connector.connect(
+        host = 'localhost',
+        user = 'root',
+        password = 'admin',
+        database = 'alignme'
+    )
         cursor = conn.cursor()
         # Buscar só pelo email (sem senha)
-        cursor.execute("SELECT nome, senha FROM medico WHERE email = ?", (email,))
+        cursor.execute("SELECT nome, senha FROM medico WHERE email = %s", (email,))
         usuario = cursor.fetchone()
         conn.close()
 

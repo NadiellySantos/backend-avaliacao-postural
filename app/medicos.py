@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException, status, Request
 from fastapi.responses import JSONResponse
-import sqlite3
+import mysql.connector
 import bcrypt
 import re
 
@@ -34,12 +34,17 @@ def validar_senha(senha: str) -> bool:
 
 # Cria a tabela MEDICO caso não exista
 def criar_tabela():
-    conn = sqlite3.connect('app/pacientes.db')
+    conn = mysql.connector.connect(
+        host = 'localhost',
+        user = 'root',
+        password = 'admin',
+        database = 'alignme'
+    )
     cursor = conn.cursor()
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS medico (
-            id_medico INTEGER PRIMARY KEY AUTOINCREMENT,
-            cpf TEXT NOT NULL UNIQUE,
+            id_medico INTEGER AUTO_INCREMENT PRIMARY KEY,
+            cpf VARCHAR(11) NOT NULL UNIQUE,
             nome TEXT NOT NULL,
             data_nascimento TEXT NOT NULL,
             especialidade TEXT,
@@ -96,14 +101,19 @@ async def cadastrar_medico(request: Request):
     senha = bcrypt.hashpw(senha_hash.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
 
     try:
-        conn = sqlite3.connect('app/pacientes.db')
+        conn = mysql.connector.connect(
+        host = 'localhost',
+        user = 'root',
+        password = 'admin',
+        database = 'alignme'
+        )
         cursor = conn.cursor()
 
         cursor.execute("""
             INSERT INTO medico (
                 cpf, nome, data_nascimento, especialidade,
                 telefone, crm, sexo, email, senha
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
         """, (
             cpf, nome, data_nascimento, especialidade,
             telefone, crm, sexo, email, senha
@@ -114,7 +124,7 @@ async def cadastrar_medico(request: Request):
 
         return JSONResponse(content={"mensagem": "Médico cadastrado com sucesso!"})
 
-    except sqlite3.IntegrityError:
+    except mysql.connector.IntegrityError as e:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
             detail="CPF já cadastrado"
@@ -127,7 +137,12 @@ async def cadastrar_medico(request: Request):
 
 @router.get("/listar-medicos")
 def listar_medicos():
-    conn = sqlite3.connect('app/pacientes.db')
+    conn = mysql.connector.connect(
+        host = 'localhost',
+        user = 'root',
+        password = 'admin',
+        database = 'alignme'
+    )
     cursor = conn.cursor()
     cursor.execute("SELECT id_medico, nome, data_nascimento, especialidade, sexo FROM medico")
     medicos = cursor.fetchall()

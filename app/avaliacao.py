@@ -1,18 +1,23 @@
 from fastapi import APIRouter, HTTPException, status, Request
 from fastapi.responses import JSONResponse
-import sqlite3
+import mysql.connector
 
 router = APIRouter()
 
 # Criar a tabela se não existir
 def criar_tabela():
-    conn = sqlite3.connect("app/pacientes.db")
+    conn = mysql.connector.connect(
+        host = 'localhost',
+        user = 'root',
+        password = 'admin',
+        database = 'alignme'
+    )
     cursor = conn.cursor()
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS avaliacao_medica (
-            id_avaliacao INTEGER PRIMARY KEY AUTOINCREMENT,
+            id_avaliacao INTEGER AUTO_INCREMENT PRIMARY KEY,
             id_foto INTEGER NOT NULL,
-            cpf TEXT NOT NULL,
+            cpf VARCHAR(11) NOT NULL,
             altura DOUBLE,
             resultado_avaliacao TEXT,
             data_avaliacao TEXT NOT NULL
@@ -40,7 +45,12 @@ async def cadastrar_avaliacao(request: Request):
         raise HTTPException(status_code=400, detail="Campos obrigatórios: id_foto, cpf e data_avaliacao")
 
     try:
-        conn = sqlite3.connect("app/pacientes.db")
+        conn = mysql.connector.connect(
+        host = 'localhost',
+        user = 'root',
+        password = 'admin',
+        database = 'alignme'
+    )
         cursor = conn.cursor()
         cursor.execute("""
             INSERT INTO avaliacao_medica (id_foto, cpf, altura, resultado_avaliacao, data_avaliacao)

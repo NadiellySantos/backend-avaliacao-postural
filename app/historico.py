@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException, status, Request
 from fastapi.responses import JSONResponse
-import sqlite3
+import mysql.connector
 
 router = APIRouter()
 
@@ -23,7 +23,12 @@ async def listar_avaliacao(request: Request):
         )
     
     try:
-        conn = sqlite3.connect('app/pacientes.db')
+        conn = mysql.connector.connect(
+        host = 'localhost',
+        user = 'root',
+        password = 'admin',
+        database = 'alignme'
+        )
         cursor = conn.cursor()
 
         cursor.execute("""
@@ -36,7 +41,7 @@ async def listar_avaliacao(request: Request):
 
         return {"avaliacoes": [{"id_foto": p[0], "cpf": p[1], "altura": p[2], "resultado_avaliacao": p[3], "data_avaliacao": p[4]} for p in avaliacao_medica]}
 
-    except sqlite3.IntegrityError:
+    except mysql.connector.IntegrityError as e:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
             detail="CPF não encontrado"

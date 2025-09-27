@@ -1,17 +1,38 @@
 from fastapi import APIRouter, HTTPException, status, Request
 from fastapi.responses import JSONResponse
-import sqlite3
+import mysql.connector
 
 router = APIRouter()
 
+# Validação de CPF
+def validar_cpf(cpf: str) -> bool:
+    cpf = ''.join(filter(str.isdigit, cpf))
+
+    if len(cpf) != 11 or cpf == cpf[0] * 11:
+        return False
+
+    for i in range(9, 11):
+        soma = sum(int(cpf[j]) * ((i + 1) - j) for j in range(i))
+        digito = (soma * 10) % 11
+        if digito == 10:
+            digito = 0
+        if digito != int(cpf[i]):
+            return False
+    return True
+
 # Cria a tabela PESSOA caso não exista, agora com idade e sexo
 def criar_tabela():
-    conn = sqlite3.connect('app/pacientes.db')
+    conn = mysql.connector.connect(
+        host = 'localhost',
+        user = 'root',
+        password = 'admin',
+        database = 'alignme'
+    )
     cursor = conn.cursor()
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS pessoa (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            cpf TEXT NOT NULL UNIQUE,
+            id INTEGER AUTO_INCREMENT PRIMARY KEY,
+            cpf VARCHAR(11) NOT NULL UNIQUE,
             nome TEXT NOT NULL,
             data_nascimento TEXT NOT NULL,
             peso REAL,
@@ -54,16 +75,27 @@ async def cadastrar_paciente(request: Request):
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Campos obrigatórios faltando"
         )
+    
+    if not validar_cpf(cpf):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="CPF inválido"
+        )
 
     try:
-        conn = sqlite3.connect('app/pacientes.db')
+        conn = mysql.connector.connect(
+        host = 'localhost',
+        user = 'root',
+        password = 'admin',
+        database = 'alignme'
+        )
         cursor = conn.cursor()
 
         cursor.execute("""
             INSERT INTO pessoa (
                 cpf, nome, data_nascimento, peso, raca, profissao,
                 telefone, tipo_corporal, idade, sexo
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
         """, (
             cpf, nome, data_nascimento, peso, raca, profissao,
             telefone, tipo_corporal, idade, sexo
@@ -74,12 +106,13 @@ async def cadastrar_paciente(request: Request):
 
         return JSONResponse(content={"mensagem": "Paciente cadastrado com sucesso!"})
 
-    except sqlite3.IntegrityError:
+    except mysql.connector.IntegrityError as e:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
             detail="CPF já cadastrado"
         )
     except Exception as e:
+        print("ERRO AO CADASTRAR PACIENTE:", e)  # 👈 loga no terminal
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=str(e)
@@ -87,7 +120,12 @@ async def cadastrar_paciente(request: Request):
         
 @router.get("/listar-pacientes")
 def listar_pacientes():
-    conn = sqlite3.connect('app/pacientes.db')
+    conn = mysql.connector.connect(
+        host = 'localhost',
+        user = 'root',
+        password = 'admin',
+        database = 'alignme'
+    )
     cursor = conn.cursor()
     cursor.execute("SELECT id, nome, idade, sexo FROM pessoa")
     pacientes = cursor.fetchall()
