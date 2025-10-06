@@ -30,40 +30,39 @@ app.include_router(historico_router)
 
 
 # Nomes dos pontos (seguindo protocolo anatômico)
-# Lista de pontos identificados (na mesma ordem do algoritmo de detecção)
 nomes = [
     "ACD",   # 0
-    "ACE",  # 1
-    "EAE",# 2
-    "EAD",# 3
+    "ACE",   # 1
+    "EAE",   # 2
+    "EAD",   # 3
     "CUE",   # 4
-    "CUD",  # 5
-    "TFD", # 6
-    "TFE",# 7
-    "LJD",  # 8
-    "LJE", # 9
-    "TTD",# 10
-    "TTE",# 11
-    "MLD",# 12
-    "MLE" # 13
+    "CUD",   # 5
+    "TFD",   # 6
+    "TFE",   # 7
+    "LJD",   # 8
+    "LJE",   # 9
+    "TTD",   # 10
+    "TTE",   # 11
+    "MLD",   # 12
+    "MLE"    # 13
 ]
 
-# Conexões entre os pontos (pares de índices)
+# Conexões entre os pontos
 conexoes = [
-    (0, 3),   # Ombro esquerdo -> iliaca Direito
-    (1, 2),   # Ombro Direito -> iliaca Esquerdo
-    (2, 3),   # iliaca Direito -> Punho Direito    
-    (0, 1),   # Ombro Direito -> Ombro Esquerdo
-    (6, 8),   # Quadril Direito -> Joelho Direito
-    (7, 9),   # Quadril esquerdo -> Joelho Esquerdo
-    (8, 10),  # Joelho Direito -> Tornozelo Direito
-    (9, 11),  # Joelho Esquerdo -> Tornozelo Esquerdo
-    (10, 12), # Tornozelo Direito -> Calcanhar Direito
-    (11, 13), # Tornozelo Esquerdo -> Calcanhar Esquerdo
-    (2, 7),  # iliaca esquerda -> Quadril esquerdo
-    (3, 6),  # iliaca direita -> Quadril direito
-    (0, 5),  # ombro direita -> punho direito
-    (1, 4),  # ombro esquerdo -> punho esquerdo
+    (0, 3),
+    (1, 2),
+    (2, 3),
+    (0, 1),
+    (6, 8),
+    (7, 9),
+    (8, 10),
+    (9, 11),
+    (10, 12),
+    (11, 13),
+    (2, 7),
+    (3, 6),
+    (0, 5),
+    (1, 4),
 ]
 
 
@@ -86,7 +85,7 @@ def detectar_marcadores_brancos(img):
 def reordenar_pontos(pontos):
     grupos = {}
     for p in pontos:
-        y_key = round(p[1] / 50)  # agrupa por "faixa de altura"
+        y_key = round(p[1] / 50)
         if y_key not in grupos:
             grupos[y_key] = []
         grupos[y_key].append(p)
@@ -94,14 +93,26 @@ def reordenar_pontos(pontos):
     pontos_ordenados = []
     for _, grupo in sorted(grupos.items()):
         if len(grupo) == 2:
-            grupo = sorted(grupo, key=lambda x: x[0])  # esquerda = menor X
+            grupo = sorted(grupo, key=lambda x: x[0])
             pontos_ordenados.extend(grupo)
         else:
             pontos_ordenados.extend(grupo)
     return pontos_ordenados
 
 
-# 🔹 Desenhar os pontos e conexões
+# 🔹 Desenhar malha quadriculada
+def desenhar_malha(img, spacing=50, color=(200, 200, 200), thickness=1):
+    h, w = img.shape[:2]
+    # Linhas verticais
+    for x in range(0, w, spacing):
+        cv2.line(img, (x, 0), (x, h), color, thickness)
+    # Linhas horizontais
+    for y in range(0, h, spacing):
+        cv2.line(img, (0, y), (w, y), color, thickness)
+    return img
+
+
+# 🔹 Desenhar pontos e conexões
 def desenhar_linhas_com_conexoes(img, pontos):
     for idx, ponto in enumerate(pontos):
         x, y = ponto
@@ -124,11 +135,16 @@ async def process_image(file: UploadFile = File(...), referencia_pixels: float =
     if img is None:
         return JSONResponse(content={"error": "Erro ao processar imagem"}, status_code=400)
 
+    
+
     # Detectar e organizar pontos
     pontos = detectar_marcadores_brancos(img)
     pontos = reordenar_pontos(pontos)
 
+    # Desenhar conexões e pontos
     desenhar_linhas_com_conexoes(img, pontos)
+    # 🔹 Adicionar malha quadriculada antes dos pontos
+    img = desenhar_malha(img, spacing=50)
 
     # Escala: 1 metro = 100 cm
     escala_cm_por_pixel = 100 / referencia_pixels
@@ -146,6 +162,7 @@ async def process_image(file: UploadFile = File(...), referencia_pixels: float =
                 "distancia_cm": dist_cm
             })
 
+    # Codificar imagem para Base64
     _, img_encoded = cv2.imencode(".jpg", img)
     img_base64 = base64.b64encode(img_encoded).decode("utf-8")
 
