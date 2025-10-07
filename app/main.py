@@ -1,6 +1,7 @@
 from fastapi import FastAPI, File, UploadFile, Form
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi import APIRouter
 import cv2
 import numpy as np
 import base64
@@ -9,7 +10,9 @@ from app.medicos import router as medicos_router
 from app.login import router as login_router
 from app.avaliacao import router as avaliacao_router
 from app.historico import router as historico_router
+from app.sagital import sagital_router
 
+router = APIRouter()
 
 app = FastAPI()
 
@@ -27,6 +30,7 @@ app.include_router(medicos_router)
 app.include_router(login_router)
 app.include_router(avaliacao_router)
 app.include_router(historico_router)
+app.include_router(sagital_router)
 
 
 # Nomes dos pontos (seguindo protocolo anatômico)
