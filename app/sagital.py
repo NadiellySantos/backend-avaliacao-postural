@@ -40,6 +40,12 @@ conexoes = [
     (11, 12)
 ]
 
+angulos_para_calcular = [
+    (2, 5, 8, "Ângulo Tronco-Ombro-Quadril"),
+    # adicione mais conforme precisar (p1, p2, p3, "nome")
+]
+
+
 # 🔹 Desenhar malha quadriculada
 def desenhar_malha(img, spacing=50, color=(200, 200, 200), thickness=1):
     h, w = img.shape[:2]
@@ -93,6 +99,17 @@ def detectar_marcadores_brancos(img):
     pontos = sorted(pontos, key=lambda p: (p[1], p[0]))
     return pontos
 
+def calcular_angulo(p1, p2, p3):
+    a = np.array(p1)
+    b = np.array(p2)
+    c = np.array(p3)
+    ba = a - b
+    bc = c - b
+    cos_ang = np.dot(ba, bc) / (np.linalg.norm(ba) * np.linalg.norm(bc))
+    cos_ang = np.clip(cos_ang, -1.0, 1.0)
+    angulo = np.degrees(np.arccos(cos_ang))
+    return round(angulo, 2)
+
 
 # 🔹 Função para desenhar pontos e conexões
 def desenhar_linhas_com_conexoes(img, pontos):
@@ -137,6 +154,39 @@ async def process_image_sagital(
 
     # Desenha pontos e conexões
     desenhar_linhas_com_conexoes(img, pontos)
+    angulos_resultados = []
+
+    if len(pontos) > 8:  # só pra garantir que os pontos existem
+        # Exemplo: ângulo entre pontos 2 - 5 - 8 (tronco, ombro, quadril)
+        angulo_tronco = calcular_angulo(pontos[6], pontos[5], pontos[8])
+        angulos_resultados.append({
+            "nome": "Ângulo do Quadril",
+            "pontos": ("6", "5", "8"),
+            "angulo_graus": angulo_tronco
+        })
+
+        # Outro exemplo: ângulo do cotovelo (ombro - cotovelo - punho)
+        angulo_cotovelo = calcular_angulo(pontos[2], pontos[5], pontos[7])
+        angulos_resultados.append({
+            "nome": "Ângulo da coluna",
+            "pontos": ("2", "5", "7"),
+            "angulo_graus": angulo_cotovelo
+        })
+
+    # 🔹 Desenha os valores na imagem
+    for angulo in angulos_resultados:
+        p_central = pontos[int(angulo["pontos"][1])]  # ponto central do ângulo
+        cv2.putText(
+            img,
+            f"{angulo['angulo_graus']}°",
+            (p_central[0] + 10, p_central[1] - 10),
+            cv2.FONT_HERSHEY_SIMPLEX,
+            0.7,
+            (0, 0, 255),
+            2,
+            cv2.LINE_AA,
+        )
+
     desenhar_malha(img)
     # Calcula a escala baseada na referência marcada manualmente
     dist_px_ref = np.sqrt((ref_x2 - ref_x1) ** 2 + (ref_y2 - ref_y1) ** 2)
@@ -164,5 +214,6 @@ async def process_image_sagital(
     return {
         "image": img_base64,
         "distancias": distancias_cm,
+        "angulos": angulos_resultados,
         "escala_cm_por_pixel": escala_cm_por_pixel,
     }
