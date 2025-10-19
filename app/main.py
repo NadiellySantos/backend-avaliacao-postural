@@ -13,7 +13,6 @@ from app.historico import router as historico_router
 from app.sagital import sagital_router
 
 router = APIRouter()
-
 app = FastAPI()
 
 app.add_middleware(
@@ -33,14 +32,14 @@ app.include_router(historico_router)
 app.include_router(sagital_router)
 
 
-# Nomes dos pontos (seguindo protocolo anatômico)
+# 🔹 Nomes dos pontos (seguindo protocolo anatômico)
 nomes = [
     "ACD",   # 0
     "ACE",   # 1
     "EAE",   # 2
     "EAD",   # 3
-    "CUE",   # 4
-    "CUD",   # 5
+    "CRE",   # 4
+    "CRD",   # 5
     "TFD",   # 6
     "TFE",   # 7
     "LJD",   # 8
@@ -51,7 +50,7 @@ nomes = [
     "MLE"    # 13
 ]
 
-# Conexões entre os pontos
+# 🔹 Conexões entre os pontos
 conexoes = [
     (0, 3),
     (1, 2),
@@ -69,6 +68,23 @@ conexoes = [
     (1, 4),
 ]
 
+# 🔹 Descrições manuais para cada conexão
+descricoes_conexoes = {
+    (0, 3): "Acrômio Direito - Espinha ilíaca ântero-superior direita.",
+    (1, 2): "Acrômio Esquerdo - Espinha ilíaca ântero-superior esquerda.",
+    (2, 3): "Espinha ilíaca ântero-superior esquerda - Espinha ilíaca ântero-superior direita.",
+    (0, 1): "Acrômio direito - Acrômio esquerdo",
+    (6, 8): "Trocânter maior do fêmur direito - Linha articular do joelho direito",
+    (7, 9): "Trocânter maior do fêmur esquerdo - Linha articular do joelho esquerdo",
+    (8, 10): "Linha articular do joelho direito - Tuberosidade tibial direita.",
+    (9, 11): "Linha articular do joelho esquerdo - Tuberosidade tibial esquerda.",
+    (10, 12): "Tuberosidade tibial direita - Maléolo lateral direito.",
+    (11, 13): "Tuberosidade tibial esquerda - Maléolo lateral esquerdo.",
+    (2, 7): "Espinha ilíaca ântero-superior esquerda - Trocânter maior do fêmur esquerdo.",
+    (3, 6): "Espinha ilíaca ântero-superior direita - Trocânter maior do fêmur direito.",
+    (0, 5): "Acrômio direito - Cabeça do rádio direito.",
+    (1, 4): "Acrômio esquerdo - Cabeça do rádio esquerdo.",
+}
 
 # 🔹 Detectar marcadores brancos
 def detectar_marcadores_brancos(img):
@@ -107,10 +123,8 @@ def reordenar_pontos(pontos):
 # 🔹 Desenhar malha quadriculada
 def desenhar_malha(img, spacing=50, color=(200, 200, 200), thickness=1):
     h, w = img.shape[:2]
-    # Linhas verticais
     for x in range(0, w, spacing):
         cv2.line(img, (x, 0), (x, h), color, thickness)
-    # Linhas horizontais
     for y in range(0, h, spacing):
         cv2.line(img, (0, y), (w, y), color, thickness)
     return img
@@ -139,18 +153,12 @@ async def process_image(file: UploadFile = File(...), referencia_pixels: float =
     if img is None:
         return JSONResponse(content={"error": "Erro ao processar imagem"}, status_code=400)
 
-    
-
-    # Detectar e organizar pontos
     pontos = detectar_marcadores_brancos(img)
     pontos = reordenar_pontos(pontos)
 
-    # Desenhar conexões e pontos
     desenhar_linhas_com_conexoes(img, pontos)
-    # 🔹 Adicionar malha quadriculada antes dos pontos
     img = desenhar_malha(img, spacing=50)
 
-    # Escala: 1 metro = 100 cm
     escala_cm_por_pixel = 100 / referencia_pixels
     distancias_cm = []
 
@@ -160,13 +168,14 @@ async def process_image(file: UploadFile = File(...), referencia_pixels: float =
             x2, y2 = pontos[j]
             dist_px = np.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2)
             dist_cm = round(dist_px * escala_cm_por_pixel, 2)
+
             distancias_cm.append({
                 "ponto1": nomes[i] if i < len(nomes) else f"P{i}",
                 "ponto2": nomes[j] if j < len(nomes) else f"P{j}",
-                "distancia_cm": dist_cm
+                "distancia_cm": dist_cm,
+                "descricao": descricoes_conexoes.get((i, j), "Ligação anatômica padrão")
             })
 
-    # Codificar imagem para Base64
     _, img_encoded = cv2.imencode(".jpg", img)
     img_base64 = base64.b64encode(img_encoded).decode("utf-8")
 
