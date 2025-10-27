@@ -8,20 +8,20 @@ sagital_router = APIRouter()
 
 # 🔹 Nomes dos pontos anatômicos (sagital)
 nomes = [
-    "PEC7", "ACD", "PET5", "ELD", "CRD", "PEL4", "6",
-    "EIPD", "EAD", "TFD", "LJD", "TTD", "MLD"
+    "PEC7", "ACD", "PET7", "ELD", "CUD", "PEL4", "PERD",
+    "EAD", "CCX", "TFD", "LJD", "TTD", "MLD"
 ]
 
 # 🔹 Descrição completa dos pontos
 descricoes_pontos = {
     "PEC7": "PEC7",
     "ACD": "ACD",
-    "PET5": "PET5",
+    "PET7": "PET7",
     "ELD": "ELD",
-    "CRD": "CRD",
+    "CUD": "CUD",
     "PEL4": "PEL4",
-    "6": "Quadril esquerdo",
-    "EIPD": "EIPD",
+    "PERD": "PERD",
+    "CCX": "CCX",
     "TFD": "TFD",
     "LJD": "LJD",
     "TTD": "TTD",
@@ -30,8 +30,8 @@ descricoes_pontos = {
 
 # 🔹 Conexões entre os pontos
 conexoes = [
-    (0, 1), (0, 2), (1, 3), (3, 4), (2, 5),
-    (5, 6), (5, 7), (8, 9), (9, 10), (10, 11),
+    (0, 1), (0, 2), (1, 3), (6, 4), (2, 5),
+    (5, 7), (7, 9), (9, 10), (10, 11),
     (5, 8), (11, 12)
 ]
 
@@ -40,14 +40,13 @@ descricoes_conexoes = {
     (0, 1): "Processo espinhoso C7 - Acrômio direito.",
     (0, 2): "Processo espinhoso C7 - Processo espinhoso T5.",
     (1, 3): "Acrômio direito - Epicôndilo lateral direito.",
-    (3, 4): "Epicôndilo lateral direito - Cabeça do rádio direito.",
-    (2, 5): "Processo espinhoso T5 - Processo espinhoso L4.",
-    (5, 6): "Processo espinhoso L4 - 6",
-    (5, 7): "Processo espinhoso L4 - Espinha ilíaca póstero-superior direita.",
+    (6, 4): "Cabeça da Ulna direita - Processo estilóide do rádio direito.",
+    (2, 5): "Processo espinhoso T7 - Processo espinhoso L4.",
+    (5, 7): "Processo espinhoso L4 - Espinha ilíaca ântero-superior direita..",
     (8, 9): "Espinha ilíaca ântero-superior direita - Trocânter maior do fêmur direito.",
     (9, 10): "Trocânter maior do fêmur direito - Linha articular do joelho direito.",
     (10, 11): "Linha articular do joelho direito - Tuberosidade tibial direita.",
-    (5, 8): "Processo espinhoso L4 - Espinha ilíaca ântero-superior direita.",
+    (5, 8): "Processo espinhoso L4 - Coccix",
     (11, 12): "Tuberosidade tibial direita - Maléolo lateral direito.",
 }
 
@@ -148,31 +147,21 @@ async def process_image_sagital(
     if len(pontos) > 8:
         angulo_tronco = calcular_angulo(pontos[6], pontos[5], pontos[8])
         angulos_resultados.append({
-            "nome": "Ângulo do Quadril",
-            "pontos": ("6", "5", "8"),
+            "nome": "PET7 - PEL4 - EAD",
+            "pontos": ("2", "5", "7"),
             "angulo_graus": angulo_tronco
         })
 
         angulo_cotovelo = calcular_angulo(pontos[2], pontos[5], pontos[7])
         angulos_resultados.append({
-            "nome": "Ângulo da Coluna",
-            "pontos": ("2", "5", "7"),
+            "nome": "PET7 - PEL4 - CCX",
+            "pontos": ("2", "5", "8"),
             "angulo_graus": angulo_cotovelo
         })
 
     for angulo in angulos_resultados:
         p_central = pontos[int(angulo["pontos"][1])]
-        cv2.putText(
-            img,
-            f"{angulo['angulo_graus']}°",
-            (p_central[0] + 10, p_central[1] - 10),
-            cv2.FONT_HERSHEY_SIMPLEX,
-            0.7,
-            (0, 0, 255),
-            2,
-            cv2.LINE_AA,
-        )
-
+       
     desenhar_malha(img)
 
     dist_px_ref = np.sqrt((ref_x2 - ref_x1) ** 2 + (ref_y2 - ref_y1) ** 2)

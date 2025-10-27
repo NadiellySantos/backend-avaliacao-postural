@@ -32,28 +32,15 @@ app.include_router(historico_router)
 app.include_router(sagital_router)
 
 
-# 🔹 Nomes dos pontos (seguindo protocolo anatômico)
 nomes = [
-    "ACD",   # 0
-    "ACE",   # 1
-    "EAE",   # 2
-    "EAD",   # 3
-    "CRE",   # 4
-    "CRD",   # 5
-    "TFD",   # 6
-    "TFE",   # 7
-    "LJD",   # 8
-    "LJE",   # 9
-    "TTD",   # 10
-    "TTE",   # 11
-    "MLD",   # 12
-    "MLE"    # 13
+    "ACD", "ACE", "EAD", "EAE", "PERD", "PERE",
+    "TFD", "TFE", "LJD", "LJE", "TTD", "TTE",
+    "MLD", "MLE"
 ]
 
-# 🔹 Conexões entre os pontos
 conexoes = [
-    (0, 3),
-    (1, 2),
+    (0, 2),
+    (1, 3),
     (2, 3),
     (0, 1),
     (6, 8),
@@ -62,16 +49,15 @@ conexoes = [
     (9, 11),
     (10, 12),
     (11, 13),
-    (2, 7),
-    (3, 6),
-    (0, 5),
-    (1, 4),
+    (2, 6),
+    (3, 7),
+    (0, 4),
+    (1, 5),
 ]
 
-# 🔹 Descrições manuais para cada conexão
 descricoes_conexoes = {
-    (0, 3): "Acrômio Direito - Espinha ilíaca ântero-superior direita.",
-    (1, 2): "Acrômio Esquerdo - Espinha ilíaca ântero-superior esquerda.",
+    (0, 2): "Acrômio Direito - Espinha ilíaca ântero-superior direita.",
+    (1, 3): "Acrômio Esquerdo - Espinha ilíaca ântero-superior esquerda.",
     (2, 3): "Espinha ilíaca ântero-superior esquerda - Espinha ilíaca ântero-superior direita.",
     (0, 1): "Acrômio direito - Acrômio esquerdo",
     (6, 8): "Trocânter maior do fêmur direito - Linha articular do joelho direito",
@@ -80,28 +66,45 @@ descricoes_conexoes = {
     (9, 11): "Linha articular do joelho esquerdo - Tuberosidade tibial esquerda.",
     (10, 12): "Tuberosidade tibial direita - Maléolo lateral direito.",
     (11, 13): "Tuberosidade tibial esquerda - Maléolo lateral esquerdo.",
-    (2, 7): "Espinha ilíaca ântero-superior esquerda - Trocânter maior do fêmur esquerdo.",
-    (3, 6): "Espinha ilíaca ântero-superior direita - Trocânter maior do fêmur direito.",
-    (0, 5): "Acrômio direito - Cabeça do rádio direito.",
-    (1, 4): "Acrômio esquerdo - Cabeça do rádio esquerdo.",
+    (2, 6): "Espinha ilíaca ântero-superior direita - Trocânter maior do fêmur direito.",
+    (3, 7): "Espinha ilíaca ântero-superior esquerda - Trocânter maior do fêmur esquerdo.",
+    (0, 4): "Acrômio direito - Cabeça do rádio direito.",
+    (1, 5): "Acrômio esquerdo - Cabeça do rádio esquerdo.",
 }
 
-# 🔹 Detectar marcadores brancos
+# ---------------------------
+# Função melhorada de detecção
+# ---------------------------
 def detectar_marcadores_brancos(img):
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    _, thresh = cv2.threshold(gray, 220, 255, cv2.THRESH_BINARY)
-    kernel = np.ones((5, 5), np.uint8)
-    thresh = cv2.morphologyEx(thresh, cv2.MORPH_OPEN, kernel)
+    blur = cv2.GaussianBlur(gray, (7, 7), 0)
+    _, thresh = cv2.threshold(blur, 200, 255, cv2.THRESH_BINARY)
+    kernel = np.ones((3, 3), np.uint8)
+    thresh = cv2.morphologyEx(thresh, cv2.MORPH_OPEN, kernel, iterations=2)
+    thresh = cv2.morphologyEx(thresh, cv2.MORPH_CLOSE, kernel, iterations=1)
     contours, _ = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
-    pontos = [(int(x), int(y)) for cnt in contours
-              if (radius := cv2.minEnclosingCircle(cnt)[1]) > 4
-              for (x, y) in [cv2.minEnclosingCircle(cnt)[0]]]
+    pontos = []
+    for cnt in contours:
+        area = cv2.contourArea(cnt)
+        if area < 20 or area > 1500:
+            continue
+        (x, y), radius = cv2.minEnclosingCircle(cnt)
+        perimeter = cv2.arcLength(cnt, True)
+        circularidade = 0 if perimeter == 0 else (4 * np.pi * area) / (perimeter ** 2)
+        if 0.7 < circularidade < 1.3 and 5 < radius < 30:
+            mask = np.zeros_like(gray)
+            cv2.circle(mask, (int(x), int(y)), int(radius), 255, -1)
+            media_brilho = cv2.mean(gray, mask=mask)[0]
+            if media_brilho > 180:
+                pontos.append((int(x), int(y)))
 
-    return sorted(pontos, key=lambda p: (p[1], p[0]))
+    pontos = sorted(pontos, key=lambda p: (p[1], p[0]))
+    return pontos
 
-
-# 🔹 Reordenar pontos em E/D
+# ---------------------------
+# Reordenar pontos (mantive sua lógica)
+# ---------------------------
 def reordenar_pontos(pontos):
     grupos = {}
     for p in pontos:
@@ -119,8 +122,9 @@ def reordenar_pontos(pontos):
             pontos_ordenados.extend(grupo)
     return pontos_ordenados
 
-
-# 🔹 Desenhar malha quadriculada
+# ---------------------------
+# Desenhar malha
+# ---------------------------
 def desenhar_malha(img, spacing=50, color=(200, 200, 200), thickness=1):
     h, w = img.shape[:2]
     for x in range(0, w, spacing):
@@ -129,8 +133,9 @@ def desenhar_malha(img, spacing=50, color=(200, 200, 200), thickness=1):
         cv2.line(img, (0, y), (w, y), color, thickness)
     return img
 
-
-# 🔹 Desenhar pontos e conexões
+# ---------------------------
+# Desenhar pontos e conexões
+# ---------------------------
 def desenhar_linhas_com_conexoes(img, pontos):
     for idx, ponto in enumerate(pontos):
         x, y = ponto
@@ -142,10 +147,23 @@ def desenhar_linhas_com_conexoes(img, pontos):
         if i < len(pontos) and j < len(pontos):
             cv2.line(img, pontos[i], pontos[j], (0, 255, 255), 2)
 
+# ---------------------------
+# Util: codifica imagem BGR para base64 (jpeg)
+# ---------------------------
+def img_to_base64_bgr(img):
+    _, img_encoded = cv2.imencode(".jpg", img)
+    return base64.b64encode(img_encoded).decode("utf-8")
 
-# 🔹 Rota principal
+
+# ---------------------------
+# Rota principal (com debug opcional)
+# ---------------------------
 @app.post("/process-image")
-async def process_image(file: UploadFile = File(...), referencia_pixels: float = Form(...)):
+async def process_image(
+    file: UploadFile = File(...),
+    referencia_pixels: float = Form(...),
+    debug: bool = Form(False)  # passar "true" no form se quiser máscaras
+):
     contents = await file.read()
     nparr = np.frombuffer(contents, np.uint8)
     img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
@@ -153,15 +171,21 @@ async def process_image(file: UploadFile = File(...), referencia_pixels: float =
     if img is None:
         return JSONResponse(content={"error": "Erro ao processar imagem"}, status_code=400)
 
-    pontos = detectar_marcadores_brancos(img)
+    # Detectar
+    if debug:
+        pontos, masks = detectar_marcadores_brancos(img, debug=True)
+    else:
+        pontos = detectar_marcadores_brancos(img)
+
     pontos = reordenar_pontos(pontos)
 
-    desenhar_linhas_com_conexoes(img, pontos)
-    img = desenhar_malha(img, spacing=50)
+    # Desenhar sobre uma cópia para não poluir masks
+    out_img = img.copy()
+    desenhar_linhas_com_conexoes(out_img, pontos)
+    out_img = desenhar_malha(out_img, spacing=50)
 
     escala_cm_por_pixel = 100 / referencia_pixels
     distancias_cm = []
-
     for i, j in conexoes:
         if i < len(pontos) and j < len(pontos):
             x1, y1 = pontos[i]
@@ -176,11 +200,15 @@ async def process_image(file: UploadFile = File(...), referencia_pixels: float =
                 "descricao": descricoes_conexoes.get((i, j), "Ligação anatômica padrão")
             })
 
-    _, img_encoded = cv2.imencode(".jpg", img)
-    img_base64 = base64.b64encode(img_encoded).decode("utf-8")
-
-    return {
-        "image": img_base64,
+    result = {
+        "image": img_to_base64_bgr(out_img),
         "distancias": distancias_cm,
-        "referencia_pixels": referencia_pixels
+        "referencia_pixels": referencia_pixels,
+        "pontos_detectados": pontos
     }
+
+    if debug:
+        # encode masks
+        result["masks"] = {k: img_to_base64_bgr(v) for k, v in masks.items()}
+
+    return result
