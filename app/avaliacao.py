@@ -23,6 +23,7 @@ def criar_tabela():
                 foto_sagital LONGTEXT,
                 medidas_frontal TEXT,
                 medidas_sagital TEXT,
+                angulos_sagital TEXT,
                 altura DOUBLE,
                 resultado_avaliacao TEXT,
                 data_avaliacao TEXT NOT NULL
@@ -57,6 +58,7 @@ async def cadastrar_avaliacao(request: Request):
     altura = data.get("altura")
     resultado = data.get("resultado_avaliacao")
     data_avaliacao = data.get("data_avaliacao")
+    angulos_sagital = data.get("angulos_sagital")
 
     # ✅ Converte altura para float se possível
     try:
@@ -81,19 +83,20 @@ async def cadastrar_avaliacao(request: Request):
             database='alignme'
         )
         with conn.cursor() as cursor:
-            cursor.execute("""
+           cursor.execute("""
                 INSERT INTO avaliacao_medica (
                     id_paciente, foto_frontal, foto_sagital,
-                    medidas_frontal, medidas_sagital,
+                    medidas_frontal, medidas_sagital, angulos_sagital,
                     altura, resultado_avaliacao, data_avaliacao
                 )
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
             """, (
                 id_paciente,
                 foto_frontal,
                 foto_sagital,
                 medidas_frontal,
                 medidas_sagital,
+                angulos_sagital,   # ← NOVO
                 altura,
                 resultado,
                 data_avaliacao

@@ -16,16 +16,18 @@ async def listar_avaliacoes(id_paciente: int):
         cursor = conn.cursor(dictionary=True)
         cursor.execute("""
             SELECT 
-                id_avaliacao,
-                id_paciente,
-                foto_frontal,
-                foto_sagital,
-                medidas_frontal,
-                medidas_sagital,
-                altura,
-                resultado_avaliacao,
-                data_avaliacao
+            id_avaliacao,
+            id_paciente,
+            foto_frontal,
+            foto_sagital,
+            medidas_frontal,
+            medidas_sagital,
+            angulos_sagital,
+            altura,
+            resultado_avaliacao,
+            data_avaliacao
             FROM avaliacao_medica
+
             WHERE id_paciente = %s
             ORDER BY data_avaliacao DESC
         """, (id_paciente,))
@@ -39,6 +41,8 @@ async def listar_avaliacoes(id_paciente: int):
                     r["medidas_frontal"] = eval(r["medidas_frontal"])  # ou json.loads()
                 if r["medidas_sagital"]:
                     r["medidas_sagital"] = eval(r["medidas_sagital"])
+                if r["angulos_sagital"]:
+                    r["angulos_sagital"] = eval(r["angulos_sagital"])
             except Exception:
                 r["medidas_frontal"] = []
                 r["medidas_sagital"] = []
