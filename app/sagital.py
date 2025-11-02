@@ -8,8 +8,8 @@ sagital_router = APIRouter()
 
 # 🔹 Nomes dos pontos anatômicos (sagital)
 nomes = [
-    "PEC7", "ACD", "PET7", "ELD", "CUD", "PEL4", "PERD",
-    "EAD", "CCX", "TFD", "LJD", "TTD", "MLD"
+    "PEC7", "ACD", "PET7", "ELUD", "CUD", "PEL4", "PERD",
+    "EAD", "CCX", "TFD", "ELFD", "CFD", "MLD"
 ]
 
 # 🔹 Descrição completa dos pontos
@@ -17,14 +17,14 @@ descricoes_pontos = {
     "PEC7": "PEC7",
     "ACD": "ACD",
     "PET7": "PET7",
-    "ELD": "ELD",
+    "ELUD": "ELUD",
     "CUD": "CUD",
     "PEL4": "PEL4",
     "PERD": "PERD",
     "CCX": "CCX",
     "TFD": "TFD",
-    "LJD": "LJD",
-    "TTD": "TTD",
+    "ELFD": "ELFD",
+    "CFD": "CFD",
     "MLD": "MLD"
 }
 
@@ -39,15 +39,15 @@ conexoes = [
 descricoes_conexoes = {
     (0, 1): "Processo espinhoso C7 - Acrômio direito.",
     (0, 2): "Processo espinhoso C7 - Processo espinhoso T5.",
-    (1, 3): "Acrômio direito - Epicôndilo lateral direito.",
+    (1, 3): "Acrômio direito - Epicôndilo lateral da ulna direito.",
     (6, 4): "Cabeça da Ulna direita - Processo estilóide do rádio direito.",
     (2, 5): "Processo espinhoso T7 - Processo espinhoso L4.",
     (5, 7): "Processo espinhoso L4 - Espinha ilíaca ântero-superior direita..",
     (8, 9): "Espinha ilíaca ântero-superior direita - Trocânter maior do fêmur direito.",
-    (9, 10): "Trocânter maior do fêmur direito - Linha articular do joelho direito.",
-    (10, 11): "Linha articular do joelho direito - Tuberosidade tibial direita.",
+    (9, 10): "Trocânter maior do fêmur direito - Epicôndilo lateral do fêmur direito.",
+    (10, 11): "Epicôndilo lateral do fêmur direito - Cabeça da fíbula direita.",
     (5, 8): "Processo espinhoso L4 - Coccix",
-    (11, 12): "Tuberosidade tibial direita - Maléolo lateral direito.",
+    (11, 12): "Cabeça da fíbula direita - Maléolo lateral direito.",
 }
 
 # 🔹 Função para desenhar malha

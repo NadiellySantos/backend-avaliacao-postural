@@ -34,7 +34,7 @@ app.include_router(sagital_router)
 
 nomes = [
     "ACD", "ACE", "EAD", "EAE", "PERD", "PERE",
-    "TFD", "TFE", "LJD", "LJE", "TTD", "TTE",
+    "TFD", "TFE", "ELFD", "ELFE", "CFD", "CFE",
     "MLD", "MLE"
 ]
 
@@ -60,12 +60,12 @@ descricoes_conexoes = {
     (1, 3): "Acrômio Esquerdo - Espinha ilíaca ântero-superior esquerda.",
     (2, 3): "Espinha ilíaca ântero-superior esquerda - Espinha ilíaca ântero-superior direita.",
     (0, 1): "Acrômio direito - Acrômio esquerdo",
-    (6, 8): "Trocânter maior do fêmur direito - Linha articular do joelho direito",
-    (7, 9): "Trocânter maior do fêmur esquerdo - Linha articular do joelho esquerdo",
-    (8, 10): "Linha articular do joelho direito - Tuberosidade tibial direita.",
-    (9, 11): "Linha articular do joelho esquerdo - Tuberosidade tibial esquerda.",
-    (10, 12): "Tuberosidade tibial direita - Maléolo lateral direito.",
-    (11, 13): "Tuberosidade tibial esquerda - Maléolo lateral esquerdo.",
+    (6, 8): "Trocânter maior do fêmur direito - Epicôndilo lateral do fêmur direito",
+    (7, 9): "Trocânter maior do fêmur esquerdo - Epicôndilo lateral do fêmur esquerdo",
+    (8, 10): "Epicôndilo lateral do fêmur direito - Cabeça da fíbula direita.",
+    (9, 11): "Epicôndilo lateral do fêmur esquerdo - Cabeça da fíbula esquerda.",
+    (10, 12): "Cabeça da fíbula direita - Maléolo lateral direito.",
+    (11, 13): "Cabeça da fíbula esquerda - Maléolo lateral esquerdo.",
     (2, 6): "Espinha ilíaca ântero-superior direita - Trocânter maior do fêmur direito.",
     (3, 7): "Espinha ilíaca ântero-superior esquerda - Trocânter maior do fêmur esquerdo.",
     (0, 4): "Acrômio direito - Cabeça do rádio direito.",
