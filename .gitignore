@@ -172,3 +172,7 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
+
+# Banco de dados de pacientes e arquivo de projeto SQLite
+app/pacientes.db
+app/pacientes.sqbpro
