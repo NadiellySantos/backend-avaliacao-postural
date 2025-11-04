@@ -31,6 +31,7 @@ jobs:
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v3
         with:
-          app-name: <NOME-DO-SEU-APP> # Substitua pelo nome exato do seu App Service no Azure
+          app-name: backend-avaliacao=postural # Substitua pelo nome exato do seu App Service no Azure
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE }}
           package: .
+
