@@ -36,5 +36,6 @@ jobs:
         with:
           app-name: backend-avaliacao-postural         # 🔸 troque para o nome exato do App Service (ex: meuappflask)
           slot-name: Production             # 🔸 normalmente é "Production", pode deixar assim
+          package: .
 
 
