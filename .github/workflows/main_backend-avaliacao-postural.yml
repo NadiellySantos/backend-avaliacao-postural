@@ -28,6 +28,7 @@ jobs:
       - name: Instalar dependências
         run: |
           python -m pip install --upgrade pip
+          pip install mediapipe==0.10.21
           pip install -r requirements.txt
 
       # ✅ DEPLOY PARA O APP SERVICE
@@ -37,5 +38,6 @@ jobs:
           app-name: backend-avaliacao-postural         # 🔸 troque para o nome exato do App Service (ex: meuappflask)
           slot-name: Production             # 🔸 normalmente é "Production", pode deixar assim
           package: .
+
 
 
