@@ -7,7 +7,7 @@ python-multipart==0.0.9
 
 # --- Visão computacional e IA ---
 opencv-python-headless==4.8.1.78
-mediapipe==0.10.14
+mediapipe==0.10.9
 numpy==1.26.4
 scipy==1.15.2
 Pillow==11.1.0
@@ -31,4 +31,5 @@ Jinja2==3.1.6
 MarkupSafe==3.0.2
 click==8.1.8
 blinker==1.9.0
+
 
