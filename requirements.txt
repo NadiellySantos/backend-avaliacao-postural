@@ -1,44 +1,8 @@
-﻿# --- Frameworks principais ---
 fastapi==0.115.12
 uvicorn==0.34.2
 Flask==3.1.0
 SQLAlchemy==2.0.40
 python-multipart==0.0.9
-
-# --- Visão computacional e IA ---
 opencv-python-headless==4.8.1.78
 numpy==1.26.4
 Pillow==11.1.0
-matplotlib==3.10.1
-mediapipe==0.10.14
-
-# --- Utilitários e dependências ---
-pydantic==2.11.4
-pydantic_core==2.33.2
-typing_extensions==4.13.2
-anyio==4.9.0
-idna==3.10
-colorama==0.4.6
-packaging==24.2
-six==1.17.0
-attrs==25.3.0
-sniffio==1.3.1
-
-# --- Extras opcionais ---
-Werkzeug==3.1.3
-itsdangerous==2.2.0
-Jinja2==3.1.6
-MarkupSafe==3.0.2
-click==8.1.8
-blinker==1.9.0
-
-
-
-
-
-
-
-
-
-
-
