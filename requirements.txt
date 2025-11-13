@@ -9,10 +9,8 @@ python-multipart==0.0.9
 opencv-python-headless==4.8.1.78
 numpy==1.26.4
 Pillow==11.1.0
-scipy==1.15.2
-
 matplotlib==3.10.1
-mediapipe==0.10.21
+mediapipe==0.10.14
 
 # --- Utilitários e dependências ---
 pydantic==2.11.4
@@ -33,6 +31,7 @@ Jinja2==3.1.6
 MarkupSafe==3.0.2
 click==8.1.8
 blinker==1.9.0
+
 
 
 
