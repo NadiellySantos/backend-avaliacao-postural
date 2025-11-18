@@ -23,10 +23,12 @@ def validar_cpf(cpf: str) -> bool:
 # Cria a tabela PESSOA caso não exista, agora com idade e sexo
 def criar_tabela():
     conn = mysql.connector.connect(
-        host = 'localhost',
-        user = 'root',
-        password = 'admin',
-        database = 'alignme'
+        host='tccalignme.mysql.database.azure.com', # Host do Azure MySQL
+        user='adminuser',                            # Usuário do Azure MySQL
+        password='Gnbg6twvJp9cqFR',                          # Senha do Azure MySQL
+        database='tccalignme',                            # Nome do banco
+        port=3306,                                     # Porta padrão
+        ssl_ca='/path/to/BaltimoreCyberTrustRoot.crt.pem'  # SSL obrigatório
     )
     cursor = conn.cursor()
     cursor.execute('''
@@ -84,10 +86,12 @@ async def cadastrar_paciente(request: Request):
 
     try:
         conn = mysql.connector.connect(
-        host = 'localhost',
-        user = 'root',
-        password = 'admin',
-        database = 'alignme'
+            host='tccalignme.mysql.database.azure.com', # Host do Azure MySQL
+            user='adminuser',                            # Usuário do Azure MySQL
+            password='Gnbg6twvJp9cqFR',                          # Senha do Azure MySQL
+            database='tccalignme',                            # Nome do banco
+            port=3306,                                     # Porta padrão
+            ssl_ca='/path/to/BaltimoreCyberTrustRoot.crt.pem'  # SSL obrigatório
         )
         cursor = conn.cursor()
 
@@ -121,10 +125,12 @@ async def cadastrar_paciente(request: Request):
 @router.get("/listar-pacientes")
 def listar_pacientes():
     conn = mysql.connector.connect(
-        host = 'localhost',
-        user = 'root',
-        password = 'admin',
-        database = 'alignme'
+        host='tccalignme.mysql.database.azure.com', # Host do Azure MySQL
+        user='adminuser',                            # Usuário do Azure MySQL
+        password='Gnbg6twvJp9cqFR',                          # Senha do Azure MySQL
+        database='tccalignme',                            # Nome do banco
+        port=3306,                                     # Porta padrão
+        ssl_ca='/path/to/BaltimoreCyberTrustRoot.crt.pem'  # SSL obrigatório
     )
     cursor = conn.cursor()
     cursor.execute("SELECT id, nome, idade, sexo FROM pessoa")

@@ -17,7 +17,9 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
+    allow_origins=["http://localhost:3000",
+                   "https://polite-beach-00fc32300.3.azurestaticapps.net"         
+                ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
