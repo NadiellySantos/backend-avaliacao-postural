@@ -4,7 +4,6 @@ import pymysql
 pymysql.install_as_MySQLdb()
 
 router = APIRouter()
-
 # ✅ Função para criar a tabela automaticamente
 def criar_tabela():
     try:
