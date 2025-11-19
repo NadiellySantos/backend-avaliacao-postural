@@ -41,7 +41,7 @@ def criar_tabela():
         password='Gnbg6twvJp9cqFR',                  # Senha do Azure MySQL
         database='tccalignme',                       # Nome do banco
         port=3306,                                   # Porta padrão
-        ssl_disabled=True  # ⬅️ Esta linha desabilita SSL
+        ssl={'check_hostname': False}
     )    
     cursor = conn.cursor()
     cursor.execute('''
@@ -110,7 +110,7 @@ async def cadastrar_medico(request: Request):
             password='Gnbg6twvJp9cqFR',                  # Senha do Azure MySQL
             database='tccalignme',                       # Nome do banco
             port=3306,                                   # Porta padrão
-            ssl_disabled=True  # ⬅️ Esta linha desabilita SSL
+            ssl={'check_hostname': False}
         )
         cursor = conn.cursor()
 
@@ -148,7 +148,7 @@ def listar_medicos():
         password='Gnbg6twvJp9cqFR',                  # Senha do Azure MySQL
         database='tccalignme',                       # Nome do banco
         port=3306,                                   # Porta padrão
-        ssl_disabled=True  # ⬅️ Esta linha desabilita SSL
+        ssl={'check_hostname': False}
     )
     cursor = conn.cursor()
     cursor.execute("SELECT id_medico, nome, data_nascimento, especialidade, sexo FROM medico")

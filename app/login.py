@@ -39,7 +39,7 @@ async def login(request: Request):
             password='Gnbg6twvJp9cqFR',                  # Senha do Azure MySQL
             database='tccalignme',                       # Nome do banco
             port=3306,                                   # Porta padrão
-            ssl_disabled=True  # ⬅️ Esta linha desabilita SSL
+            ssl={'check_hostname': False}
         )
         cursor = conn.cursor()
         # Buscar só pelo email (sem senha)
