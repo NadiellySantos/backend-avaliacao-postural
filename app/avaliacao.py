@@ -13,7 +13,8 @@ def criar_tabela():
             user='adminuser',
             password='Gnbg6twvJp9cqFR',
             database='tccalignme',
-            port=3306
+            port=3306,
+            ssl_disabled=True  # ⬅️ Esta linha desabilita SSL
         )
         with conn.cursor() as cursor:
             cursor.execute("""
@@ -82,7 +83,8 @@ async def cadastrar_avaliacao(request: Request):
             user='adminuser',                            # Usuário do Azure MySQL
             password='Gnbg6twvJp9cqFR',                  # Senha do Azure MySQL
             database='tccalignme',                       # Nome do banco
-            port=3306                                   # Porta padrão
+            port=3306,                                   # Porta padrão
+            ssl_disabled=True  # ⬅️ Esta linha desabilita SSL
         )
         with conn.cursor() as cursor:
            cursor.execute("""

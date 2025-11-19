@@ -13,7 +13,8 @@ async def listar_avaliacoes(id_paciente: int):
             user='adminuser',                            # Usuário do Azure MySQL
             password='Gnbg6twvJp9cqFR',                  # Senha do Azure MySQL
             database='tccalignme',                       # Nome do banco
-            port=3306                                   # Porta padrão
+            port=3306,                                   # Porta padrão
+            ssl_disabled=True  # ⬅️ Esta linha desabilita SSL
         )
         cursor = conn.cursor(pymysql.cursors.DictCursor)
         cursor.execute("""
