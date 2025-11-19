@@ -1,6 +1,7 @@
 from fastapi import APIRouter, HTTPException, status, Request
 from fastapi.responses import JSONResponse
-import mysql.connector
+import pymysql
+pymysql.install_as_MySQLdb()
 
 router = APIRouter()
 
@@ -22,13 +23,13 @@ def validar_cpf(cpf: str) -> bool:
 
 # Cria a tabela PESSOA caso não exista, agora com idade e sexo
 def criar_tabela():
-    conn = mysql.connector.connect(
+    conn = pymysql.connect(
         host='tccalignme.mysql.database.azure.com', # Host do Azure MySQL
         user='adminuser',                            # Usuário do Azure MySQL
-        password='Gnbg6twvJp9cqFR',                          # Senha do Azure MySQL
-        database='tccalignme',                            # Nome do banco
-        port=3306,                                     # Porta padrão
-        ssl_ca='/path/to/BaltimoreCyberTrustRoot.crt.pem'  # SSL obrigatório
+        password='Gnbg6twvJp9cqFR',                  # Senha do Azure MySQL
+        database='tccalignme',                       # Nome do banco
+        port=3306,                                   # Porta padrão
+        ssl={'ca': '/path/to/BaltimoreCyberTrustRoot.crt.pem'}  # SSL obrigatório
     )
     cursor = conn.cursor()
     cursor.execute('''
@@ -85,13 +86,13 @@ async def cadastrar_paciente(request: Request):
         )
 
     try:
-        conn = mysql.connector.connect(
+        conn = pymysql.connect(
             host='tccalignme.mysql.database.azure.com', # Host do Azure MySQL
             user='adminuser',                            # Usuário do Azure MySQL
-            password='Gnbg6twvJp9cqFR',                          # Senha do Azure MySQL
-            database='tccalignme',                            # Nome do banco
-            port=3306,                                     # Porta padrão
-            ssl_ca='/path/to/BaltimoreCyberTrustRoot.crt.pem'  # SSL obrigatório
+            password='Gnbg6twvJp9cqFR',                  # Senha do Azure MySQL
+            database='tccalignme',                       # Nome do banco
+            port=3306,                                   # Porta padrão
+            ssl={'ca': '/path/to/BaltimoreCyberTrustRoot.crt.pem'}  # SSL obrigatório
         )
         cursor = conn.cursor()
 
@@ -110,7 +111,7 @@ async def cadastrar_paciente(request: Request):
 
         return JSONResponse(content={"mensagem": "Paciente cadastrado com sucesso!"})
 
-    except mysql.connector.IntegrityError as e:
+    except pymysql.IntegrityError as e:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
             detail="CPF já cadastrado"
@@ -124,13 +125,13 @@ async def cadastrar_paciente(request: Request):
         
 @router.get("/listar-pacientes")
 def listar_pacientes():
-    conn = mysql.connector.connect(
+    conn = pymysql.connect(
         host='tccalignme.mysql.database.azure.com', # Host do Azure MySQL
         user='adminuser',                            # Usuário do Azure MySQL
-        password='Gnbg6twvJp9cqFR',                          # Senha do Azure MySQL
-        database='tccalignme',                            # Nome do banco
-        port=3306,                                     # Porta padrão
-        ssl_ca='/path/to/BaltimoreCyberTrustRoot.crt.pem'  # SSL obrigatório
+        password='Gnbg6twvJp9cqFR',                  # Senha do Azure MySQL
+        database='tccalignme',                       # Nome do banco
+        port=3306,                                   # Porta padrão
+        ssl={'ca': '/path/to/BaltimoreCyberTrustRoot.crt.pem'}  # SSL obrigatório
     )
     cursor = conn.cursor()
     cursor.execute("SELECT id, nome, idade, sexo FROM pessoa")

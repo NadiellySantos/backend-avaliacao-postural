@@ -1,21 +1,22 @@
 from fastapi import APIRouter, HTTPException, status, Request
 from fastapi.responses import JSONResponse
-import mysql.connector
+import pymysql
+pymysql.install_as_MySQLdb()
 
 router = APIRouter()
 
 @router.get("/historico/{id_paciente}")
 async def listar_avaliacoes(id_paciente: int):
     try:
-        conn = mysql.connector.connect(
+        conn = pymysql.connect(
             host='tccalignme.mysql.database.azure.com', # Host do Azure MySQL
             user='adminuser',                            # Usuário do Azure MySQL
-            password='Gnbg6twvJp9cqFR',                          # Senha do Azure MySQL
-            database='tccalignme',                            # Nome do banco
-            port=3306,                                     # Porta padrão
-            ssl_ca='/path/to/BaltimoreCyberTrustRoot.crt.pem'  # SSL obrigatório
+            password='Gnbg6twvJp9cqFR',                  # Senha do Azure MySQL
+            database='tccalignme',                       # Nome do banco
+            port=3306,                                   # Porta padrão
+            ssl={'ca': '/path/to/BaltimoreCyberTrustRoot.crt.pem'}  # SSL obrigatório
         )
-        cursor = conn.cursor(dictionary=True)
+        cursor = conn.cursor(pymysql.cursors.DictCursor)
         cursor.execute("""
             SELECT 
             id_avaliacao,

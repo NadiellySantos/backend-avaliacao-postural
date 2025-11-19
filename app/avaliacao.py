@@ -1,6 +1,7 @@
 from fastapi import APIRouter, HTTPException, Request
 from fastapi.responses import JSONResponse
-import mysql.connector
+import pymysql
+pymysql.install_as_MySQLdb()
 
 router = APIRouter()
 
@@ -8,13 +9,13 @@ router = APIRouter()
 # ✅ Função para criar a tabela automaticamente
 def criar_tabela():
     try:
-        conn = mysql.connector.connect(
+        conn = pymysql.connect(
             host='tccalignme.mysql.database.azure.com', # Host do Azure MySQL
             user='adminuser',                            # Usuário do Azure MySQL
-            password='Gnbg6twvJp9cqFR',                          # Senha do Azure MySQL
-            database='tccalignme',                            # Nome do banco
-            port=3306,                                     # Porta padrão
-            ssl_ca='/path/to/BaltimoreCyberTrustRoot.crt.pem'  # SSL obrigatório
+            password='Gnbg6twvJp9cqFR',                  # Senha do Azure MySQL
+            database='tccalignme',                       # Nome do banco
+            port=3306,                                   # Porta padrão
+            ssl={'ca': '/path/to/BaltimoreCyberTrustRoot.crt.pem'}  # SSL obrigatório
         )
         with conn.cursor() as cursor:
             cursor.execute("""
@@ -36,7 +37,7 @@ def criar_tabela():
     except Exception as e:
         print("❌ Erro ao criar/verificar tabela:", e)
     finally:
-        if conn.is_connected():
+        if conn.open:
             conn.close()
 
 
@@ -78,13 +79,13 @@ async def cadastrar_avaliacao(request: Request):
 
     # ✅ Inserção no banco de dados
     try:
-        conn = mysql.connector.connect(
+        conn = pymysql.connect(
             host='tccalignme.mysql.database.azure.com', # Host do Azure MySQL
             user='adminuser',                            # Usuário do Azure MySQL
-            password='Gnbg6twvJp9cqFR',                          # Senha do Azure MySQL
-            database='tccalignme',                            # Nome do banco
-            port=3306,                                     # Porta padrão
-            ssl_ca='/path/to/BaltimoreCyberTrustRoot.crt.pem'  # SSL obrigatório
+            password='Gnbg6twvJp9cqFR',                  # Senha do Azure MySQL
+            database='tccalignme',                       # Nome do banco
+            port=3306,                                   # Porta padrão
+            ssl={'ca': '/path/to/BaltimoreCyberTrustRoot.crt.pem'}  # SSL obrigatório
         )
         with conn.cursor() as cursor:
            cursor.execute("""
@@ -110,7 +111,7 @@ async def cadastrar_avaliacao(request: Request):
         print("✅ Avaliação cadastrada com sucesso no banco!")
         return JSONResponse(content={"mensagem": "Avaliação cadastrada com sucesso!"})
 
-    except mysql.connector.Error as err:
+    except pymysql.Error as err:
         print("❌ Erro do MySQL:", err)
         raise HTTPException(status_code=500, detail=f"Erro MySQL: {err}")
 
@@ -119,5 +120,5 @@ async def cadastrar_avaliacao(request: Request):
         raise HTTPException(status_code=500, detail=f"Erro interno: {e}")
 
     finally:
-        if conn.is_connected():
+        if conn.open:
             conn.close()
