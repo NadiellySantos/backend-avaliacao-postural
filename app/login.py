@@ -38,8 +38,7 @@ async def login(request: Request):
             user='adminuser',                            # Usuário do Azure MySQL
             password='Gnbg6twvJp9cqFR',                  # Senha do Azure MySQL
             database='tccalignme',                       # Nome do banco
-            port=3306,                                   # Porta padrão
-            ssl={'ca': '/path/to/BaltimoreCyberTrustRoot.crt.pem'}  # SSL obrigatório
+            port=3306                                   # Porta padrão
         )
         cursor = conn.cursor()
         # Buscar só pelo email (sem senha)

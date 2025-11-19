@@ -10,12 +10,11 @@ router = APIRouter()
 def criar_tabela():
     try:
         conn = pymysql.connect(
-            host='tccalignme.mysql.database.azure.com', # Host do Azure MySQL
-            user='adminuser',                            # Usuário do Azure MySQL
-            password='Gnbg6twvJp9cqFR',                  # Senha do Azure MySQL
-            database='tccalignme',                       # Nome do banco
-            port=3306,                                   # Porta padrão
-            ssl={'ca': '/path/to/BaltimoreCyberTrustRoot.crt.pem'}  # SSL obrigatório
+            host='tccalignme.mysql.database.azure.com',
+            user='adminuser',
+            password='Gnbg6twvJp9cqFR',
+            database='tccalignme',
+            port=3306
         )
         with conn.cursor() as cursor:
             cursor.execute("""
@@ -84,8 +83,7 @@ async def cadastrar_avaliacao(request: Request):
             user='adminuser',                            # Usuário do Azure MySQL
             password='Gnbg6twvJp9cqFR',                  # Senha do Azure MySQL
             database='tccalignme',                       # Nome do banco
-            port=3306,                                   # Porta padrão
-            ssl={'ca': '/path/to/BaltimoreCyberTrustRoot.crt.pem'}  # SSL obrigatório
+            port=3306                                   # Porta padrão
         )
         with conn.cursor() as cursor:
            cursor.execute("""
