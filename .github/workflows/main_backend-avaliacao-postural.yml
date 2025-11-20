@@ -34,9 +34,10 @@ jobs:
       - name: Fazer deploy no Azure
         uses: azure/webapps-deploy@v3
         with:
-          app-name: backend-avaliacao-postural         # 🔸 troque para o nome exato do App Service (ex: meuappflask)
+          app-name: backend-alignme         # 🔸 troque para o nome exato do App Service (ex: meuappflask)
           slot-name: Production             # 🔸 normalmente é "Production", pode deixar assim
           package: .
+
 
 
 
