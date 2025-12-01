@@ -204,7 +204,7 @@ GET	→ /listar-medicos	→ Lista médicos
   }
   ```
 
-  ---
+---
 
 ## 🔹 `app/avaliacao.py` — Registro de Avaliação
 Tabela: avaliacao_medica
@@ -239,7 +239,7 @@ Valida campos obrigatórios, converte altura para float e insere no MySQL.
   ]
   ```
 
-  ---
+---
 
   ## 🐳 Docker
 
@@ -261,7 +261,7 @@ Valida campos obrigatórios, converte altura para float e insere no MySQL.
   docker run -p 8000:8000 avaliacao-backend
   ```
 
-  ---
+---
   
   ## 🧪 Como Rodar o Projeto
   
@@ -300,18 +300,19 @@ Valida campos obrigatórios, converte altura para float e insere no MySQL.
   docker run -p 8000:8000 avaliacao-postural-backend
   ```
 
-  ---
+---
   
   ## 📌 Fluxo geral da aplicação
   Frontend Web → Backend FastAPI → MediaPipe Pose → Cálculo de Ângulos → Histórico → Retorno JSON
+
+---
   
-  👥 Autores
+  ## 👥 Autores
   
   - **Claudia Galindo Santos**
   - **Mayara Silva Azevedo**
   - **Nadiélly Oliveira Santos**
   
-
 ---
 
-  ##Projeto desenvolvido para o Trabalho de Conclusão de Curso em Engenharia da Computação, na Faculdade Engenheiro Salvador Arena - 2025.##
+## Projeto desenvolvido para o Trabalho de Conclusão de Curso em Engenharia da Computação, na Faculdade Engenheiro Salvador Arena - 2025.
