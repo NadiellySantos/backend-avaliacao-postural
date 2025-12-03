@@ -176,3 +176,6 @@ cython_debug/
 # Banco de dados de pacientes e arquivo de projeto SQLite
 app/pacientes.db
 app/pacientes.sqbpro
+
+
+.env
